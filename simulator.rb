@@ -1,4 +1,4 @@
-require './application'
+require './lib/application'
 # Set max dimension values for table grid below example is for 5 X 5 units.
 if ARGV[0]
   dimension_x = 5

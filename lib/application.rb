@@ -1,5 +1,5 @@
-require './instruction'
-require './robot'
+require './lib/instruction'
+require './lib/robot'
 
 # This class is used for robot simulation.
 class Application
