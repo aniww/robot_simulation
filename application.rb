@@ -1,51 +1,64 @@
 require './instruction'
 require './robot'
-puts '#### Robot Simulation ####'
 
-@instructions = []
-
-def position_details(line)
-  line.slice! 'PLACE '
-  line.split(',')
-end
-
-def add_instruction(line)
-  if line.include? 'PLACE'
-    position = position_details line
-    @instructions << Instruction.new(position[0], position[1], position[2])
-  else
-    @instructions.last.moves << line
+# This class is used for robot simulation.
+class Application
+  def initialize(file, max_x, max_y)
+    puts '#### Robot Simulation ####'
+    @instructions = []
+    @max_x = max_x
+    @max_y = max_y
+    read_commands_file file
   end
-end
 
-def read_commands_file(path)
-  if File.file?(path)
-    File.readlines(path).each do |line|
-      line = line.strip.chomp
-      add_instruction line
+  def read_commands_file(path)
+    if File.file?(path)
+      File.readlines(path).each do |line|
+        line = line.strip.chomp
+        add_instruction line
+      end
+      execute_commands
+    else
+      puts "File doesn't exist:- #{path}"
     end
-  else
-    puts "File doesn't exist:- #{path}"
   end
-end
 
-def show_instruction(instruction)
-  print 'PLACE '
-  print instruction.x_position
-  print ','
-  print instruction.y_position
-  print ','
-  puts instruction.facing
-end
+  def add_instruction(line)
+    if line.include? 'PLACE'
+      position = position_details line
+      if position.length == 3
+        @instructions << Instruction.new(position[0], position[1], position[2])
+      end
+    elsif @instructions.last.is_a?(Instruction)
+      @instructions.last.moves << line
+    end
+  end
 
-def process_instructions
-  @instructions.each do |instruction|
+  def position_details(line)
+    line.slice! 'PLACE '
+    line.split(',')
+  end
+
+  def show_instruction(instruction)
+    puts ' '
+    print 'PLACE '
+    print instruction.x_position
+    print ','
+    print instruction.y_position
+    print ','
+    puts instruction.facing
+  end
+
+  def process_instruction(instruction)
+    robot = Robot.new(instruction.x_position, instruction.y_position,
+                      instruction.facing, @max_x, @max_y)
     show_instruction(instruction)
-    instruction.moves.each do |move|
-      puts move
+    robot.operate(instruction.moves)
+  end
+
+  def execute_commands
+    @instructions.each do |instruction|
+      process_instruction(instruction)
     end
   end
 end
-
-read_commands_file ARGV[0]
-process_instructions

@@ -3,5 +3,5 @@
 ## Execute robot simulation using below command
 
 ```
-ruby application.rb FILE_PATH
+ruby simulator.rb FILE_PATH
 ```
